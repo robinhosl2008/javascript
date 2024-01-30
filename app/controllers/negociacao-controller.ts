@@ -1,3 +1,4 @@
+import { DiasDaSemana } from '../enums/dias-da-semana.js';
 import { Negociacao } from '../models/negociacao.js';
 import { Negociacoes } from '../models/negociacoes.js';
 import { MensagemView } from '../views/mensagem-view.js';
@@ -18,22 +19,26 @@ export class NegociacaoController {
         this.negociacoesView.update(this.negociacoes);
     }
 
-    adiciona(): void {
+    public adiciona(): void {
         const negociacao = this.criaNegociacao();
+
+        if (!this.eDiaUtil(negociacao)) {
+            this.mensagemView.update("Apenas dias úteis", "warning");
+            this.removeMensagem();
+            return;
+        }
+
         negociacao.data.setDate(12);
         this.negociacoes.adiciona(negociacao);
-        this.negociacoesView.update(this.negociacoes);
-
-        this.mensagemView.update('O novo registro foi guardado!', 'info');
-
-        setTimeout(() => {
-            this.mensagemView.update('', '');
-        }, 3000);
-
-        this.limparFormulario();
+        this.atualizaView(this.negociacoes);
+        this.limparFormulario(); 
     }
 
-    criaNegociacao(): Negociacao {
+    private eDiaUtil(negociacao: Negociacao): boolean {
+        return negociacao.data.getDay() > DiasDaSemana.DOMINGO && negociacao.data.getDay() < DiasDaSemana.SABADO;
+    }
+
+    private criaNegociacao(): Negociacao {
         const exp = /-/g;
         const date = new Date(this.inputData.value.replace(exp, ','));
         const quantidade = parseInt(this.inputQuantidade.value);
@@ -41,10 +46,24 @@ export class NegociacaoController {
         return new Negociacao(date, quantidade, valor);
     }
 
-    limparFormulario(): void {
+    private atualizaView(negociacoes: Negociacoes) {
+        this.negociacoesView.update(negociacoes);
+
+        this.mensagemView.update('O novo registro foi guardado!', 'info');
+
+        this.removeMensagem();
+    }
+
+    private limparFormulario(): void {
         this.inputData.value = '';
         this.inputQuantidade.value = '';
         this.inputValor.value = '';
         this.inputData.focus();
+    }
+
+    private removeMensagem() {
+        setTimeout(() => {
+            this.mensagemView.update('', '');
+        }, 3000);
     }
 }
