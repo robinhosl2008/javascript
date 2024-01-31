@@ -1,9 +1,11 @@
 {
     "compilerOptions": {
-        "outDir": "dist/js",
-        "target": "ES6",
-        "noEmitOnError": true,
-        "noImplicitAny": true
+        "outDir": "dist/js", // O TypeScript será compilado nessa pasta.
+        "target": "ES6", // Essa é a versão compilada para o JavaScript.
+        "noEmitOnError": true, // Impede a compilação do TypeScript para o JavaScript caso tenham erros.
+        "noImplicitAny": true, // Impede que a compilação aceite variáves, por exemplo, do tipo 'any'.
+        "removeComments": true, // Ao compilar o código todos os comentários em métodos são apagados.
+        "strictNullChecks": true, // Essa opção nos obriga a tratar caso o valor seja 'NULL' em uma variável que não tenha essa possibilidade.
     },
-    "include": ["app/**/*"]
-}
+    "include": ["app/**/*"] // Essa opção diz para considerar todas as pastas e arquivos dentro desse diretório.
+} 

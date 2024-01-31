@@ -2,50 +2,64 @@ import { Negociacoes } from "../models/negociacoes.js";
 
 export class View {
     protected elemento: HTMLElement;
+    private escapar: boolean = false;
 
-    constructor(seletor: string) {
-        this.elemento = document.querySelector(seletor);
+    constructor(seletor: string, escapar?: boolean) {
+        this.elemento = document.querySelector(seletor) as HTMLInputElement;
+        
+        if (escapar) {
+            this.escapar = escapar;
+        }
+    } 
+
+    protected templateMensagem(mensagem: string, tipoMensagem: string): string {
+        let template = `
+            <p class="alert alert-${tipoMensagem}">
+                ${mensagem}
+            </p>
+        `;
+
+        template = this.escaparTemplate(template);
+
+        return template;
     }
 
-    protected template(tpTemplate: string, model?: Negociacoes, mensagem?: string, tipoMensagem?: string): string {
-        let template;
-
-        switch (tpTemplate) {
-            case 'alert':
-                template = `
-                    <p class="alert alert-${tipoMensagem}">
-                        ${mensagem}
-                    </p>
-                `;
-                break;
+    protected templateLista(model: Negociacoes): string {
+        let template = `
+            <table class="table table-hover table-bordered">
+                <thead>
+                    <td>DATA</td>
+                    <td>QUANTIDADE</td>
+                    <td>VALOR</td>
+                </thead>
+                <tbody>
+                    ${model.lista().map(negociacao => {
+                        return `
+                            <tr>
+                                <td>${this.formataData(negociacao.data)}</td>
+                                <td>${negociacao.quantidade}</td>
+                                <td>${negociacao.valor}</td>
+                            </tr>
+                        `;
+                    }).join(' ')}
+                </tbody>
+            </table>
+        `;
         
-            case 'lista':
-                template = `
-                    <table class="table table-hover table-bordered">
-                        <thead>
-                            <td>DATA</td>
-                            <td>QUANTIDADE</td>
-                            <td>VALOR</td>
-                        </thead>
-                        <tbody>
-                            ${model.lista().map(negociacao => {
-                                return `
-                                    <tr>
-                                        <td>${this.formataData(negociacao.data)}</td>
-                                        <td>${negociacao.quantidade}</td>
-                                        <td>${negociacao.valor}</td>
-                                    </tr>
-                                `;
-                            }).join(' ')}
-                        </tbody>
-                    </table>
-                `;
-                break;
-        }
+        template = this.escaparTemplate(template);
+
         return template;
     }
 
     private formataData(data: Date): string {
         return new Intl.DateTimeFormat().format(data)
+    }
+
+    private escaparTemplate(template: string): string {
+        if (this.escapar) {
+            template = template.replace(/<script>[\s\S]*?<\/script>/, '');
+        }
+
+        return template;
     }
 }

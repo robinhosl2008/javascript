@@ -9,18 +9,22 @@ export class NegociacaoController {
     private inputQuantidade: HTMLInputElement;
     private inputValor: HTMLInputElement;
     private negociacoes = new Negociacoes();
-    private negociacoesView = new NegociacaoView('#negociacoesView');
-    private mensagemView = new MensagemView('#mensagemView');
+    private negociacoesView = new NegociacaoView('#negociacoesView', true);
+    private mensagemView = new MensagemView('#mensagemView', true);
 
     constructor() {
-        this.inputData = document.querySelector('#data');
-        this.inputQuantidade = document.querySelector('#quantidade');
-        this.inputValor = document.querySelector('#valor');
+        this.inputData = document.querySelector('#data') as HTMLInputElement;
+        this.inputQuantidade = document.querySelector('#quantidade') as HTMLInputElement;
+        this.inputValor = document.querySelector('#valor') as HTMLInputElement;
         this.negociacoesView.update(this.negociacoes);
     }
 
     public adiciona(): void {
-        const negociacao = this.criaNegociacao();
+        const negociacao = Negociacao.criaDe(
+            this.inputData.value,
+            this.inputQuantidade.value,
+            this.inputValor.value
+        );
 
         if (!this.eDiaUtil(negociacao)) {
             this.mensagemView.update("Apenas dias úteis", "warning");
@@ -36,14 +40,6 @@ export class NegociacaoController {
 
     private eDiaUtil(negociacao: Negociacao): boolean {
         return negociacao.data.getDay() > DiasDaSemana.DOMINGO && negociacao.data.getDay() < DiasDaSemana.SABADO;
-    }
-
-    private criaNegociacao(): Negociacao {
-        const exp = /-/g;
-        const date = new Date(this.inputData.value.replace(exp, ','));
-        const quantidade = parseInt(this.inputQuantidade.value);
-        const valor = parseFloat(this.inputValor.value);
-        return new Negociacao(date, quantidade, valor);
     }
 
     private atualizaView(negociacoes: Negociacoes) {

@@ -3,7 +3,7 @@ import { View } from "./view.js";
 
 export class NegociacaoView extends View {
     public update(model: Negociacoes): void {
-        const template = this.template('lista', model);
+        let template = this.templateLista(model);
         this.elemento.innerHTML = template;
     }
 }
